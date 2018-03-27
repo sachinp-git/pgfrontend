@@ -7,7 +7,7 @@ import Typography from 'material-ui/Typography';
 import Button from 'material-ui/Button';
 import jstz from 'jstz';
 import './Login.css';
-
+import {signup} from '../Actions/loginAction.js'
 
 const styles = theme => ({
     container: {
@@ -44,9 +44,9 @@ class Register extends Component {
         this.state={
             fullName:"Sachin Pandey",
             emailId:"sachin.reaper94@gmail.com",
-            passwordError:true,
-            emailError:true,
-            nameError:true,
+            passwordError:false,
+            emailError:false,
+            nameError:false,
             timezone:timezone.name()
         }
     }
@@ -57,7 +57,7 @@ class Register extends Component {
             this.setState({ fullName: event.target.value })
                break;
             case "email":
-            this.setState({ name: event.target.value })
+            this.setState({ email: event.target.value })
                break;
             case "password":
             this.setState({ password: event.target.value })
@@ -68,13 +68,27 @@ class Register extends Component {
       handleSubmit = event => {
         let credentials={
             email:this.state.email,
-            password:this.state.password
+            password:this.state.password,
+            name:this.state.fullName
         }  
-
+        signup(credentials).then((res)=>{
+          console.log(res)
+         if(res==200){
+           alert("Successfully registered")
+          this.props.history.push('/') 
+        }
+        }).catch(error=>{
+          this.setState({
+            passwordError:true,
+            emailError:true,
+            nameError:true,
+          })
+        })
         console.log(event.target,"$$$")
       };
 
   render() {
+   
     const { classes } = this.props;
 
     return (
@@ -89,7 +103,6 @@ class Register extends Component {
          id="fullName"
          label=" Invalid Full Name!! Type again"
          className={classes.textField}
-         value={this.state.fullName}
          onChange={this.handleChange}
          margin="normal"
        />    
@@ -97,7 +110,6 @@ class Register extends Component {
           id="name"
           label="Full Name"
           className={classes.textField}
-          value={this.state.fullName}
           onChange={this.handleChange}
           margin="normal"
         />}
@@ -107,14 +119,12 @@ class Register extends Component {
           id="email"
           label="Invalid Email!! Type again"
           className={classes.textField}
-          value={this.state.emailId}
           onChange={this.handleChange}
           margin="normal"/> :
           <TextField
             id="email"
             label="Email Id"
             className={classes.textField}
-            value={this.state.emailId}
             onChange={this.handleChange}
             margin="normal"/>
         }

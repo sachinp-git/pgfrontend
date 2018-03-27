@@ -5,22 +5,20 @@ let data=[{appointMentWith:'Mr x',
           utcTime:'2018-03-27T12:00'},
           {appointMentWith:'Mr z',
           utcTime:'2018-03-27T17:00'}]
-
 var moment = require('moment-timezone');
 var momentn= require('moment')
 
 export function convertToLocalTimezone(data,timezone){
-    let dateTimeObject=data.reduce(function(LocalDateTime,data){
-         let date=moment(data.utcTime).tz(timezone).format('YYYY-MM-DD');
-         let time=moment(data.utcTime).tz(timezone).format('HH');
-         if (!LocalDateTime[date]) {
-          console.log("inside if")
-          LocalDateTime[date]=[]
-          }
-          LocalDateTime[date].push(parseInt(time))
-         return LocalDateTime
-    },{})
-    console.log(dateTimeObject)   
+
+    let localDateTime=data.map(function(date){
+        console.log(date,timezone)
+         let hour=moment(date).tz(timezone).format('HH');
+         let minute=moment(date).tz(timezone).format('mm'); 
+         let day=moment(date).tz(timezone).format('YYYY-MM-DD'); 
+         return day+"T"+hour+":00"
+    })
+    console.log(localDateTime,"******")
+    return localDateTime
 }
    
 export function converToUtc(dateArray){

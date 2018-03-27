@@ -6,6 +6,7 @@ import { FormControl, FormHelperText } from 'material-ui/Form';
 import TextField from 'material-ui/TextField';
 import Typography from 'material-ui/Typography';
 import Button from 'material-ui/Button';
+import {login} from '../Actions/loginAction.js'
 import './Login.css';
 
 
@@ -44,8 +45,7 @@ class Login extends Component {
     constructor(props){
         super(props);
         this.state={
-            name:"Sachin",
-            emailError:true,
+            emailError:false,
             passwordError:false
         }
     }
@@ -53,7 +53,7 @@ class Login extends Component {
     handleChange = event => {
         switch(event.target.id){
             case "email":
-            this.setState({ name: event.target.value })
+            this.setState({ email: event.target.value })
                break;
             case "password":
             this.setState({ password: event.target.value })
@@ -65,13 +65,29 @@ class Login extends Component {
             email:this.state.email,
             password:this.state.password
         }  
+        login(credentials).then(res=>{
 
-        console.log(event.target,"$$$")
+        }).catch((error)=>{
+          switch(error.code){
+            case 402:
+            this.setState({
+              passwordError:true,
+              emailError:false
+            })
+            break;
+            case 401:
+            case 400:
+            this.setState({
+              passwordError:true,
+              emailError:true
+            })
+            break;
+          }
+        })   
       };
 
   render() {
     const { classes } = this.props;
-
      return (
     <div className="login">
       <Typography variant="display3" color="inherit">
@@ -84,14 +100,14 @@ class Login extends Component {
           id="email"
           label="Invalid Email"
           className={classes.textField}
-          value={this.state.email}
+          //value={this.state.email}
           onChange={this.handleChange}
           margin="normal"/> :
           <TextField
             id="email"
             label="Email Id"
             className={classes.textField}
-            value={this.state.name}
+           // value={this.state.email}
             onChange={this.handleChange}
             margin="normal"/>
         }

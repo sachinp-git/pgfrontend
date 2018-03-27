@@ -7,12 +7,12 @@ import {
     FormControlLabel,
     FormHelperText,
   } from 'material-ui/Form';
-  import Button from 'material-ui/Button';
-
-  import Checkbox from 'material-ui/Checkbox';
-  import { withStyles } from 'material-ui/styles'; 
- import TextField from 'material-ui/TextField';
- import bookAppointment from '../Actions/bookappointment.js'
+import Button from 'material-ui/Button';
+import Checkbox from 'material-ui/Checkbox';
+import { withStyles } from 'material-ui/styles'; 
+import TextField from 'material-ui/TextField';
+import {bookAppointment,getUserSlots} from '../Actions/bookappointment.js'
+import Typography from 'material-ui/Typography';
 const moment=require('moment')
 
 const styles = theme => ({
@@ -44,6 +44,7 @@ class BookAppointment extends Component {
             bookedDates:null,
             selectedDate:today,
             today,
+            error:false,
             newSlots:[],
             appointmentWith:this.props.match.params.appointmentWith,
         }
@@ -69,6 +70,7 @@ class BookAppointment extends Component {
             return
         }
         else{
+
             let response=bookAppointment(this.state.newSlots,this.state.appointmentWith)
         }
     }
@@ -78,6 +80,7 @@ class BookAppointment extends Component {
         this.setState({
             newSlots:[],
             selectedDate:e.target.value,
+            
         })
         console.log(e.target.value)
     }
@@ -85,10 +88,9 @@ class BookAppointment extends Component {
     generateTimeCells=(bool,hourNow)=>{
         let cells=[]
        for(let i=hourNow;i<24;i++){
-         let hourFormat = parseInt(i/10)==0 ? "0"+i+":00 " : i+":00 "
-         
+         let hourFormat = parseInt(i/10)==0 ? "0"+i+":00" : i+":00"
          let DateTimeFormat=this.state.selectedDate+"T"+hourFormat
-           if(bool && this.state.bookedDates.indexOf(DateTimeFormat)){
+           if(this.state.bookedDates.indexOf(DateTimeFormat)!=-1){
               cells.push(
                 <FormControlLabel
                 control={
@@ -122,9 +124,14 @@ class BookAppointment extends Component {
 
     render() {
         console.log(this.state)
+        if(this.state.error){
+            return <h1>Could Not Load Data</h1>
+        }
         if(!this.state.dataLoaded){
             return <h1>LOADING</h1>
         }
+        
+
         const { classes } = this.props;
         let hourNow;
         if(this.state.selectedDate!=this.state.today){
@@ -134,8 +141,8 @@ class BookAppointment extends Component {
             hourNow=parseInt(moment().add(1,'hour').format('HH'))
         }
         let cells=[];
-        if(this.state.bookedDates[this.state.selectedDate]){
-            cells=this.generateTimeCells(true,hourNow)
+        if(this.state.bookedDates.indexOf(this.state.selectedDate)!=-1){
+            console.log("bool true")
         }
         else{
             cells=this.generateTimeCells(false,hourNow)
@@ -143,6 +150,9 @@ class BookAppointment extends Component {
         
       return (
         <div className="bookappointment">
+           <Typography variant="headline" color="inherit" className={classes.caption}>
+            Book Appointment with {this.state.appointmentWith}
+          </Typography>       
           <form className={classes.container} noValidate>
            <TextField
              id="date"
@@ -170,14 +180,23 @@ class BookAppointment extends Component {
     }
 
     componentDidMount(){
-        this.setState({
-            bookedDates:[
-               '2018-03-27T10:00',
-                '2018-03-27T12:00',
-                '2018-03-27T17:00'],
-            dataLoaded:true
+        getUserSlots(this.state.appointmentWith).then((res)=>{
+            console.log(res,"%%%%%%%%%%")
+            this.setState({
+                bookedDates:[...res],
+                dataLoaded:true,
+                error:false
+            })
+        }).catch((err)=>{
+            console.log(err,"error")
+            if(err.code==401){
+                alert(err.error.message)               
+            }
+            this.setState({
+                error:true
+            })
         })
-
+       
     }
   }
   
