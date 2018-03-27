@@ -70,8 +70,7 @@ class BookAppointment extends Component {
             return
         }
         else{
-
-            let response=bookAppointment(this.state.newSlots,this.state.appointmentWith)
+          bookAppointment(this.state.newSlots,this.state.appointmentWith)    
         }
     }
 

@@ -18,7 +18,7 @@ return new Promise((resolve,reject)=>{
       })
       .then(response => response.json())
       .then(res=>{
-        if(res==200){
+        if(res.userName){
         resolve(res)
        }
         else{

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Login from './Pages/Login.js'
 import Register from './Pages/Register.js'
+import Mybookings from './Pages/MyBookings.js'
 import BookAppointment from './Pages/BookAppointment.js'
 import { Switch, Route } from 'react-router-dom'
 import './App.css';
@@ -25,6 +26,7 @@ class App extends Component {
            <Route exact path='/' component={Login}/>
            <Route exact path='/register' component={Register}/>
            <Route exact path='/book/:appointmentWith' component={BookAppointment}/>
+           <Route exact path='/mybookings' component={Mybookings}/>
         </Switch>
       </div>  
       </div>

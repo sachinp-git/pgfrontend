@@ -66,8 +66,11 @@ class Login extends Component {
             password:this.state.password
         }  
         login(credentials).then(res=>{
-
+            sessionStorage.setItem('username',res.userName)
+            sessionStorage.setItem('timezone',res.timezone)
+            this.props.history.push('/mybookings')
         }).catch((error)=>{
+          console.log("ERROR",error);
           switch(error.code){
             case 402:
             this.setState({

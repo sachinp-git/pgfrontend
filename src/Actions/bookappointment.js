@@ -1,4 +1,4 @@
-import {converToUtc,convertToLocalTimezone} from '../utils/ConvertToLocalTimezone.js'
+import {converToUtc,convertToLocalTimezone,convertAppointmentDetails} from '../utils/ConvertToLocalTimezone.js'
 import axios from 'axios'
 import {apiconfig} from '../APIS/apiconfig.js'
 import jstz from 'jstz';
@@ -20,9 +20,14 @@ export function bookAppointment(slots,appointmentWith){
   }
   axios.post(url,postData)
   .then((res)=>{
-    console.log(res,"response form bookappointment api")
+    if(res.data==200){
+        alert("Successfully Booked Slot")
+    }
+    else{
+        alert("Could Not book Slot")
+    }
   }).catch((err)=>{
-    console.log(err)
+    alert("Could Not book Slot")
   })
 }
 
@@ -43,7 +48,6 @@ export function getUserSlots(username){
           })
           .then(response => response.json())
           .then(res=>{
-              console.log("fetch",res)
             if(res.bookedDates){
             let localDateTime=convertToLocalTimezone(res.bookedDates,timezone)
             resolve(localDateTime)
@@ -54,14 +58,34 @@ export function getUserSlots(username){
           }).catch(error=>{
               reject(error)
           })
-        /*axios.post(url,postData).then(res=>{
-            if(res.status==200){
-                
-            }
-        }).catch(err=>{
-            console.log(err)
-            reject(err)
-        })*/
     })
     
+}
+
+export function getUserBookingDetails(username,timezone){
+    return new Promise((resolve,reject)=>{
+        let url=apiconfig.basePath+apiconfig.getUserBookingDetails;
+        let postData={
+            username
+        } 
+       fetch(url, {
+            body: JSON.stringify(postData),
+            headers: {
+              'content-type': 'application/json'
+            },
+            method: 'POST',
+            mode: 'cors',
+          })
+          .then(response => response.json())
+          .then(res=>{
+              console.log(res,"fetch")
+              if(res.bookedDates){
+                let details=convertAppointmentDetails(res.bookedDates,timezone)
+                console.log(details,"details");
+                resolve(details)
+              }
+          }).catch(error=>{
+              reject(error)
+          })
+    })
 }
