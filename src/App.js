@@ -17,7 +17,7 @@ class App extends Component {
       <AppBar position="static">
         <Toolbar>
            <Typography variant="title" color="inherit">
-            Sample App
+           Appointment App
            </Typography>
         </Toolbar>
       </AppBar>

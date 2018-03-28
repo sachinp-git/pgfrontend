@@ -1,6 +1,5 @@
 import {apiconfig} from '../APIS/apiconfig.js'
 
-
 export function login(data){
 return new Promise((resolve,reject)=>{
     let postData={
@@ -13,8 +12,8 @@ return new Promise((resolve,reject)=>{
         headers: {
           'content-type': 'application/json'
         },
-        method: 'POST', // *GET, POST, PUT, DELETE, etc.
-        mode: 'cors', // no-cors, cors, *same-origin
+        method: 'POST', 
+        mode: 'cors', 
       })
       .then(response => response.json())
       .then(res=>{
@@ -44,8 +43,8 @@ export function signup(data){
             headers: {
               'content-type': 'application/json'
             },
-            method: 'POST', // *GET, POST, PUT, DELETE, etc.
-            mode: 'cors', // no-cors, cors, *same-origin
+            method: 'POST', 
+            mode: 'cors', 
           })
           .then(response => response.json())
           .then(res=>{

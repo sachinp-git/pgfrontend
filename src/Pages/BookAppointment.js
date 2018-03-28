@@ -11,25 +11,37 @@ import Button from 'material-ui/Button';
 import Checkbox from 'material-ui/Checkbox';
 import { withStyles } from 'material-ui/styles'; 
 import TextField from 'material-ui/TextField';
-import {bookAppointment,getUserSlots} from '../Actions/bookappointment.js'
+import {bookAppointment,getUserSlots} from '../Actions/appointment.js'
 import Typography from 'material-ui/Typography';
+import Card, { CardActions, CardContent } from 'material-ui/Card';
+
 const moment=require('moment')
 
 const styles = theme => ({
+    card: {
+        minWidth: "75px",
+        margin:"5px"
+      },    
+      cardDisabled: {
+        minWidth: "75px",
+        margin:"5px",
+        backgroundColor:"red"
+      },    
     container: {
       textAlign:"center",
-      display:"flex",
-      flexDirection:"vertical"
+      margin:"auto"
     },
     textField: {
-      marginLeft: theme.spacing.unit,
-      marginRight: theme.spacing.unit,
+      //marginLeft: theme.spacing.unit,
+      //marginRight: theme.spacing.unit,
+      margin:"auto"
     },
     Loginbutton:{
         width:"75%",
         margin:"auto",
         marginTop:"30px",
-        borderRadius:"15px"
+        borderRadius:"15px",
+        maxWidth:"200px"
     }
 });
 
@@ -38,7 +50,11 @@ class BookAppointment extends Component {
         console.log(props)
         
         super(props);
+        let nextHour=moment().add(1,'hour').format('YYYY-MM-DD')
         let today=moment().format('YYYY-MM-DD')
+        if(moment(nextHour).isAfter(today)){
+               today=nextHour
+        }
         this.state={
             dataLoaded:false,
             bookedDates:null,
@@ -75,36 +91,50 @@ class BookAppointment extends Component {
     }
 
     handleDateChange=(e)=>{
-        if(e.target.value!=this.state.selectedDate)      
+        let selectedDate=e.target.value
+        if(moment(selectedDate).isBefore(moment().format('YYYY-MM-DD'))){
+            alert("Past Dates cannot be booked");
+            this.setState({
+                selectedDate:moment().format('YYYY-MM-DD')
+            })
+            return;
+        }
+        if(selectedDate!=this.state.selectedDate)      
         this.setState({
             newSlots:[],
-            selectedDate:e.target.value,
+            selectedDate,
             
         })
         console.log(e.target.value)
     }
      
-    generateTimeCells=(bool,hourNow)=>{
+    generateTimeCells=(bool,hourNow,classes)=>{
         let cells=[]
-       for(let i=hourNow;i<24;i++){
+       for(let i=hourNow;i<24;i++){  
          let hourFormat = parseInt(i/10)==0 ? "0"+i+":00" : i+":00"
+         let hourLabel= i<12 ? "AM" : "PM";
          let DateTimeFormat=this.state.selectedDate+"T"+hourFormat
            if(this.state.bookedDates.indexOf(DateTimeFormat)!=-1){
               cells.push(
+                <Card className={classes.cardDisabled}>
+                <CardContent>
                 <FormControlLabel
-                control={
-                  <Checkbox
-                    disabled
-                    color="primary"
-                  />
-                }
-                label={hourFormat+" Not Available" }
+                 control={
+                   <Checkbox
+                     disabled
+                     color="primary"
+                   />
+                 }
+                label={hourFormat+" NA" }
               />
-    
+              </CardContent>
+              </Card>
               )
            }
            else{
             cells.push(
+                <Card className={classes.card}>
+                <CardContent>
                 <FormControlLabel
                 control={
                   <Checkbox
@@ -113,8 +143,11 @@ class BookAppointment extends Component {
                     color="primary"
                   />
                 }
-                label={hourFormat}
+                label={hourFormat+" "+ hourLabel}
               />
+               </CardContent>
+              </Card>
+    
             )
            }
        }
@@ -122,7 +155,6 @@ class BookAppointment extends Component {
     }
 
     render() {
-        console.log(this.state)
         if(this.state.error){
             return <h1>Could Not Load Data</h1>
         }
@@ -144,7 +176,7 @@ class BookAppointment extends Component {
             console.log("bool true")
         }
         else{
-            cells=this.generateTimeCells(false,hourNow)
+            cells=this.generateTimeCells(false,hourNow,classes)
         }  
         
       return (
@@ -152,22 +184,25 @@ class BookAppointment extends Component {
            <Typography variant="headline" color="inherit" className={classes.caption}>
             Book Appointment with {this.state.appointmentWith}
           </Typography>       
-          <form className={classes.container} noValidate>
-           <TextField
+          <TextField
              id="date"
              label="Select Date"
              type="date"
              defaultValue={this.state.today}
+             value={this.state.selectedDate}
              className={classes.textField}
              onChange={this.handleDateChange}
              InputLabelProps={{
              shrink: true,
              }}
             />
+          <form className={classes.container} noValidate>
          <FormControl component="fieldset">
             <FormLabel component="legend">Choose Time slot</FormLabel>
              <FormGroup> 
+             <div style={{display:"flex",flexWrap:"wrap",padding:"20px"}}>
                  {cells}
+                 </div>
              </FormGroup>
              <Button variant="raised" size="large" color="primary" className={classes.Loginbutton}  onClick={this.handleSubmit}>
                Book Appointment
@@ -180,7 +215,6 @@ class BookAppointment extends Component {
 
     componentDidMount(){
         getUserSlots(this.state.appointmentWith).then((res)=>{
-            console.log(res,"%%%%%%%%%%")
             this.setState({
                 bookedDates:[...res],
                 dataLoaded:true,

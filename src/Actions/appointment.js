@@ -22,9 +22,11 @@ export function bookAppointment(slots,appointmentWith){
   .then((res)=>{
     if(res.data==200){
         alert("Successfully Booked Slot")
+        document.location.reload()
     }
     else{
         alert("Could Not book Slot")
+        document.location.reload()
     }
   }).catch((err)=>{
     alert("Could Not book Slot")

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { withStyles } from 'material-ui/styles';
 import Table, { TableBody, TableCell, TableHead, TableRow } from 'material-ui/Table';
 import Paper from 'material-ui/Paper';
-import {getUserBookingDetails} from '../Actions/bookappointment.js'
+import {getUserBookingDetails} from '../Actions/appointment.js'
 import jstz from 'jstz';
 import Typography from 'material-ui/Typography';
 
